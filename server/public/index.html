@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fellows</title>
+  </head>
+  <body>
+    <h1>Fellows</h1>
+    <ul id="fellow-list"></ul>
+
+    <form id="new-fellow-form">
+      <input name="name" placeholder="Name" required />
+      <input name="cohort" placeholder="Cohort" required />
+      <button type="submit">Add Fellow</button>
+    </form>
+
+    <script>
+      const list = document.getElementById("fellow-list");
+      const form = document.getElementById("new-fellow-form");
+
+      function loadFellows() {
+        fetch("/api/fellows")
+          .then((res) => res.json())
+          .then((data) => {
+            list.innerHTML = "";
+            data.forEach((fellow) => {
+              const li = document.createElement("li");
+              li.textContent = `${fellow.name} (Cohort ${fellow.cohort})`;
+              list.appendChild(li);
+            });
+          });
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = form.name.value;
+        const cohort = form.cohort.value;
+
+        fetch("/api/fellows", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, cohort }),
+        }).then(() => {
+          form.reset();
+          loadFellows();
+        });
+      });
+
+      loadFellows();
+    </script>
+  </body>
+</html>
